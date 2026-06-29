@@ -546,6 +546,22 @@ def test_api_build_real_x86(app):
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == "generic"
+    bin_dir = data["bin_dir"]
+
+    response = client.post(
+        "/api/v1/build",
+        json=dict(
+            target="x86/64",
+            version="25.12.2",
+            packages=["tmux", "vim"],
+            profile="another_board_name_that_resolves_to_generic",
+        ),
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == "generic"
+    assert data["bin_dir"] == bin_dir
 
     response = client.post(
         "/api/v1/build",
@@ -561,6 +577,7 @@ def test_api_build_real_x86(app):
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == "generic"
+    assert data["bin_dir"] != bin_dir
 
 
 @pytest.mark.slow
